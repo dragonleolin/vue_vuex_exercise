@@ -69,6 +69,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'Home',
   data() {
@@ -89,32 +91,22 @@ export default {
       }
       return this.products;
     },
+    ...mapGetters(['categories', 'products'])
   },
   methods: {
     getProducts() {
       const vm = this;
       const url = `${process.env.VUE_APP_APIPATH}/api/${process.env.VUE_APP_CUSTOMPATH}/products/all`;
-      vm.$store.state.isLoading = true;
+      vm.$store.dispatch('updateLoading', true)
       this.$http.get(url).then((response) => {
         vm.products = response.data.products;
         console.log('取得產品列表:', response);
         vm.getUnique();
-        vm.$store.state.isLoading = false;
+        vm.$store.dispatch('updateLoading', false)
       });
     },
-    addtoCart(id, qty = 1) {
-      const vm = this;
-      const url = `${process.env.VUE_APP_APIPATH}/api/${process.env.VUE_APP_CUSTOMPATH}/cart`;
-      vm.isLoading = true;
-      const item = {
-        product_id: id,
-        qty,
-      };
-      vm.$store.state.isLoading = true;
-      this.$http.post(url, { data: item }).then((response) => {
-        vm.$store.state.isLoading = false;
-        console.log('加入購物車:', response);
-      });
+    addtoCart(id, qty = 1) { 
+      this.$store.dispatch('addtoCart', { id, qty })
     },
     getUnique() {
       const vm = this;
