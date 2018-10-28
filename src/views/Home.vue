@@ -75,9 +75,7 @@ export default {
   name: 'Home',
   data() {
     return {
-      products: [],
       searchText: '',
-      categories: [],
     };
   },
   computed: {
@@ -91,31 +89,14 @@ export default {
       }
       return this.products;
     },
-    ...mapGetters(['categories', 'products'])
+    ...mapGetters('productsModules', [ 'categories', 'products'])
   },
   methods: {
-    getProducts() {
-      const vm = this;
-      const url = `${process.env.VUE_APP_APIPATH}/api/${process.env.VUE_APP_CUSTOMPATH}/products/all`;
-      vm.$store.dispatch('updateLoading', true)
-      this.$http.get(url).then((response) => {
-        vm.products = response.data.products;
-        console.log('取得產品列表:', response);
-        vm.getUnique();
-        vm.$store.dispatch('updateLoading', false)
-      });
-    },
     addtoCart(id, qty = 1) { 
-      this.$store.dispatch('addtoCart', { id, qty })
+     console.log(this.$store.state.productsModules.products)
+     this.$store.dispatch('addtoCart', { id, qty })
     },
-    getUnique() {
-      const vm = this;
-      const categories = new Set();
-      vm.products.forEach((item) => {
-        categories.add(item.category);
-      });
-      vm.categories = Array.from(categories);
-    },
+    ...mapActions('productsModules', ['getProducts'])
   },
   created() {
     this.getProducts();
